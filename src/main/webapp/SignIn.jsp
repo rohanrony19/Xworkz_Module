@@ -73,7 +73,7 @@
             </div>
             <span id="passwordError" class="text-danger"></span>
         </div>
-        <div><a href="OtpLogin.jsp">OTP Login</a> </div>
+        <div><a href="OtpLogin.jsp">Forgot Password?</a> </div>
         <div class="mb-3">
             <button class="btn btn-success btn-signup mt-3" type="submit">Sign In</button>
         </div>
@@ -85,16 +85,19 @@
                     <p class="text-warning text-center">Invalid Credentials</p>
                 </c:if>
                 <c:if test="${result eq 'notfound'}">
-                    <p class="text-warning text-center">Invalid UserName</p>
+                    <p class="text-warning text-center">Invalid Email</p>
+                    <div class="text-center">
+                        <a href="SignUp.jsp">Sign Up now?</a>
+                    </div>
                 </c:if>
                 <c:if test="${result eq 'fail'}">
                     <p class="text-warning text-center">Your Account has Been Blocked till 24hrs</p>
-                    <p class="text-center"><a class="link-opacity-50 " href="VerifyEmail.jsp">forgot password</a></p>
+                    <!--<p class="text-center"><a class="link-opacity-50 " href="SignIn.jsp">forgot password</a></p>-->
                 </c:if>
                 <c:if test="${result eq 'reset'}">
                     <div class="mt-2">
                         <p class="text-warning text-center">You can Reset Password</p>
-                        <p class="text-center"><a class="link-opacity-50 " href="VerifyEmail.jsp">forgot password</a></p>
+                        <p class="text-center"><a class="link-opacity-50 " href="OtpLogin.jsp">forgot password</a></p>
                     </div>
                 </c:if>
             </c:if>
