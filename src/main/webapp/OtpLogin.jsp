@@ -49,13 +49,13 @@
 </nav>
 
 <div class="otp-container">
-    <h3 class="otp-title text-center mb-4">OTP Login</h3>
+    <h3 class="otp-title text-center mb-4">Verify</h3>
 
     <!-- Email Verify -->
     <form action="emailVerify" method="post" class="mb-3">
         <div class="mb-3">
             <label for="emailId" class="form-label">Email</label>
-            <input type="email" class="form-control" id="emailId" name="email" value="${email}" required>
+            <input type="email" class="form-control" id="emailId" name="email" value="${param.email}" >
         </div>
         <div class="text-center">
             <button class="btn btn-success btn-verify">Verify Email</button>
