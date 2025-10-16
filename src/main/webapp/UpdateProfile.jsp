@@ -126,10 +126,27 @@
                 <label for="addressId">Address</label>
             </div>
 
+            <!--<div class="input-group mb-3">-->
+            <!--    <input type="file" class="form-control" id="inputGroupFile02" name="profileImage" >-->
+            <!--    <label class="input-group-text" for="inputGroupFile02">Upload</label>-->
+            <!--</div>-->
+
+            <!-- Display previous uploaded image (if any) -->
+            <c:if test="${not empty dto.imagePath}">
+                <div class="mb-2">
+                    <span class="text-success">Current File:</span>
+                    <span class="fw-bold">${dto.imagePath}</span>
+                    <!-- Show thumbnail -->
+                    <!--<img src="${pageContext.request.contextPath}/download?imagePath=${dto.imagePath}"-->
+                    <!--     alt="Profile image" style="height:50px;margin-left:10px;border-radius:5px;">-->
+                </div>
+            </c:if>
+
             <div class="input-group mb-3">
                 <input type="file" class="form-control" id="inputGroupFile02" name="profileImage">
                 <label class="input-group-text" for="inputGroupFile02">Upload</label>
             </div>
+
 
             <div class="text-center">
                 <button type="submit" class="btn btn-success w-50">Update</button>
