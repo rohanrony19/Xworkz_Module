@@ -136,9 +136,6 @@
                 <div class="mb-2">
                     <span class="text-success">Current File:</span>
                     <span class="fw-bold">${dto.imagePath}</span>
-                    <!-- Show thumbnail -->
-                    <!--<img src="${pageContext.request.contextPath}/download?imagePath=${dto.imagePath}"-->
-                    <!--     alt="Profile image" style="height:50px;margin-left:10px;border-radius:5px;">-->
                 </div>
             </c:if>
 
