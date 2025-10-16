@@ -14,4 +14,7 @@ public interface SignUpRepository {
     void updateTable(SignUpEntity entity);
     long countEmail(String userEmail);
     List<String> checkPassword(String password);
+    String getLastPassword(String email);
+    boolean updateNewPassword(String email, String encodedPassword);
+
 }
