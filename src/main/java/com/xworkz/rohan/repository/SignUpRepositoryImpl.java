@@ -73,7 +73,7 @@ public class SignUpRepositoryImpl implements SignUpRepository{
     public SignUpEntity findByEmail(String email) {
         EntityManager entityManager=null;
         EntityTransaction transaction=null;
-        SignUpEntity signUp=new SignUpEntity();
+        SignUpEntity signUp= null;
         try{
             entityManager=emf.createEntityManager();
             transaction= entityManager.getTransaction();
@@ -165,7 +165,38 @@ public class SignUpRepositoryImpl implements SignUpRepository{
         return false;
     }
 
+    public String getLastPassword(String email) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            Query query = em.createNamedQuery("getCurrentPassword");
+            query.setParameter("email", email);
+            return (String) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
+    }
 
+    public boolean updateNewPassword(String email, String encodedPassword) {
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            Query query = em.createQuery("UPDATE SignUpEntity p SET p.password = :password WHERE p.email = :email");
+            query.setParameter("password", encodedPassword);
+            query.setParameter("email", email);
+            int updated = query.executeUpdate();
+            tx.commit();
+            return updated > 0;
+        } catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            return false;
+        } finally {
+            em.close();
+        }
+    }
     @Override
     public void updateTable(SignUpEntity entity) {
         EntityManager manager=null;
