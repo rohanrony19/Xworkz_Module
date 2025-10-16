@@ -16,6 +16,10 @@ import java.time.LocalDateTime;
 @NamedQuery(name="checkEmail",query = "select e from SignUpEntity e where email=:emailBy")
 @NamedQuery(name = "countEmail",query = "select count(e.email) from SignUpEntity e where email=:email")
 @NamedQuery(name = "fetchPassword",query = "select e.password from SignUpEntity e")
+@NamedQuery(
+        name = "getCurrentPassword",
+        query = "SELECT p.password FROM SignUpEntity p WHERE p.email = :email"
+)
 public class SignUpEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
