@@ -9,10 +9,11 @@ public interface SignUpService {
     boolean save(SignUpDto sign);
     SignUpDto find(String email,String password);
     SignUpDto findByEmail(String email);
-    boolean updatePassword(String password);
+    String updatePassword(String newPassword);
     boolean updateProfile(@Valid UpdateDto sign);
     void sendOtp(String email);
     boolean verifyOtp(String otp);
     int countByEmail(String userEmail);
     boolean passwordValidate(String password);
+
 }
