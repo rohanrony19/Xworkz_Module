@@ -63,7 +63,7 @@ pageEncoding="UTF-8" isELIgnored="false"%>
 <div class="main-content container">
     <h1>Welcome to X-Workz </h1>
     <h3>${sessionScope.loginName}</h3>
-    <img src="https://backiee.com/static/wallpapers/1000x563/386745.jpg">
+    <img src="https://c4.wallpaperflare.com/wallpaper/312/851/784/dolomiti-italy-autumn-lago-antorno-landscape-photography-desktop-hd-wallpaper-for-pc-tablet-and-mobile-3840%C3%972400-wallpaper-preview.jpg">
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
