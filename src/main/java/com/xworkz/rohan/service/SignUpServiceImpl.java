@@ -90,7 +90,9 @@ public class SignUpServiceImpl implements SignUpService{
     @Override
     public SignUpDto findByEmail(String email) {
         SignUpEntity sign = repository.findByEmail(email);
+        System.out.println("in findby email");
         if (sign == null) {
+            System.out.println("no record found" + email);
             return null;
         } else {
             SignUpDto signUpDto = new SignUpDto();
@@ -103,13 +105,34 @@ public class SignUpServiceImpl implements SignUpService{
 
 
     @Override
-    public boolean updatePassword(String password) {
-        boolean update=repository.updatePassword(fetchedEmail,passwordEncoder.encode(password));
+    public String updatePassword(String newPassword) {
+        // 1️⃣ Fetch last stored password
+        String lastPasswordHash = repository.getLastPassword(fetchedEmail);
 
-        getEmail(fetchedEmail,"Password Changed","Dear User"+"\n\nPassword For your account was changed");
+        // 2️⃣ Check if new password matches the old one
+        if (lastPasswordHash != null && passwordEncoder.matches(newPassword, lastPasswordHash)) {
+            return "reuseError"; // prevent reuse
+        }
 
-        return update;
+        // 3️⃣ Encode new password
+        String encodedPassword = passwordEncoder.encode(newPassword);
+
+        // 4️⃣ Update in DB
+        boolean updated = repository.updateNewPassword(fetchedEmail, encodedPassword);
+
+        // 5️⃣ Return a String instead of boolean
+        if (updated) {
+            getEmail(
+                    fetchedEmail,
+                    "Password Changed",
+                    "Dear User,\n\nYour account password has been changed successfully."
+            );
+            return "success";
+        } else {
+            return "fail";
+        }
     }
+
 
     @Override
     public boolean updateProfile(@Valid UpdateDto sign) {
