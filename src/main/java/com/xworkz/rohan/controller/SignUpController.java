@@ -4,6 +4,7 @@ import com.xworkz.rohan.dto.PasswordDto;
 import com.xworkz.rohan.dto.SignUpDto;
 import com.xworkz.rohan.dto.UpdateDto;
 import com.xworkz.rohan.service.SignUpService;
+import com.xworkz.rohan.service.SignUpServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.BeanUtils;
@@ -54,16 +55,17 @@ public class SignUpController {
 
         if (dto == null) {
             modelAndView.addObject("result", "false");
-            modelAndView.setViewName("Signin");
+            modelAndView.setViewName("SignIn");
         } else if(dto.getEmail().equals("Locked")){
             modelAndView.addObject("result", "fail");
-            modelAndView.setViewName("Signin");
-        } else if (dto.getEmail().equals("TimeOut")) {
+            modelAndView.setViewName("SignIn");
+        }
+        else if (dto.getEmail().equals("TimeOut")) {
             modelAndView.addObject("result", "reset");
-            modelAndView.setViewName("Signin");
-        } else if (dto.getEmail().equals("notfound")) {
+            modelAndView.setViewName("SignIn");
+        }else if (dto.getEmail().equals("notfound")) {
             modelAndView.addObject("result", "notfound");
-            modelAndView.setViewName("Signin");
+            modelAndView.setViewName("SignIn");
         } else {
             session.setAttribute("loginEmail", dto.getEmail());
             session.setAttribute("loginName",dto.getName());
@@ -78,7 +80,21 @@ public class SignUpController {
     @RequestMapping("update")
     public ModelAndView showUpdate(ModelAndView view, HttpSession session) {
         String sessionEmail=(String)session.getAttribute("loginEmail");
+        log.info("Session Email: " + sessionEmail);
+
+        if (sessionEmail == null) {
+            view.addObject("error", "Please Sign In first.");
+            view.setViewName("SignIn"); // redirect to SignIn
+            return view;
+        }
+
+        // 2️⃣ Fetch DTO
         SignUpDto registerDto = signUpService.findByEmail(sessionEmail);
+        if (registerDto == null) {
+            view.addObject("error", "User not found.");
+            view.setViewName("SignIn");
+            return view;
+        }
         UpdateDto updateDto=new UpdateDto();
         BeanUtils.copyProperties(registerDto,updateDto);
         log.info(registerDto.toString());
@@ -90,7 +106,7 @@ public class SignUpController {
 
 
     // ---------------- UPDATE PROFILE (POST) ----------------
-    @PostMapping("/UpdateProfile")
+    @PostMapping("UpdateProfile")
     public ModelAndView updateProfile(@Valid UpdateDto dto, BindingResult result,
                                       @RequestParam("profileImage") MultipartFile file,
                                       ModelAndView view, HttpSession session) throws IOException {
@@ -135,7 +151,6 @@ public class SignUpController {
         return view;
     }
 
-
     // ---------------- DOWNLOAD IMAGE ----------------
     @GetMapping("download")
     public void download(HttpServletResponse response, @RequestParam String imagePath) throws IOException {
@@ -147,35 +162,31 @@ public class SignUpController {
         response.flushBuffer();
     }
 
-
-    // ---------------- PASSWORD RESET ----------------
-    @RequestMapping("verifyUserEmail")
-    public ModelAndView verifyEmail(String email, ModelAndView modelAndView) {
-        SignUpDto signUpDto = signUpService.findByEmail(email);
-        modelAndView.addObject("email", email);
-        if (signUpDto != null) {
-            modelAndView.addObject("status", "success");
-            modelAndView.setViewName("ForgotPassword");
-        } else {
-            modelAndView.addObject("status", "fail");
-            modelAndView.setViewName("VerifyEmail");
-        }
-        return modelAndView;
-    }
-
     @RequestMapping("updatePassword")
-    public ModelAndView updatePassword(@Valid PasswordDto passwordDto, BindingResult result, ModelAndView view) {
-        if (result.hasErrors()) {
-            view.addObject("errors", result.getAllErrors());
+    public ModelAndView updatePassword(PasswordDto passwordDto, ModelAndView view) {
+
+        // Call service which returns "success" or "reuseError"
+        String updateResult = signUpService.updatePassword(passwordDto.getPassword());
+
+        if ("success".equals(updateResult)) {
+            // Password updated, redirect to SignIn
+            view.addObject("message", "Password updated successfully. Please Sign In.");
+            view.setViewName("SignIn");
+        } else if ("reuseError".equals(updateResult)) {
+            // Same as last password, stay on forgot password page
+            view.addObject("message", "New password cannot be the same as your last password.");
             view.setViewName("ForgotPassword");
         } else {
-            boolean updateStatus = signUpService.updatePassword(passwordDto.getPassword());
-            view.addObject("submitted", true);
-            view.addObject("status", updateStatus);
+            view.addObject("message", "Failed to update password. Try again.");
             view.setViewName("ForgotPassword");
         }
+
         return view;
     }
+
+
+
+
 
     // ---------------- HOME ----------------
     @RequestMapping("home")
@@ -194,6 +205,7 @@ public class SignUpController {
             modelAndView.addObject("result", "verified");
             modelAndView.setViewName("OtpLogin");
         } else {
+            signUpService.sendOtp(email);
             modelAndView.addObject("result", "notVerified");
             modelAndView.addObject("email", email);
             modelAndView.setViewName("OtpLogin");
@@ -211,9 +223,15 @@ public class SignUpController {
             view.setViewName("OtpLogin");
         } else {
             SignUpDto dto = signUpService.findByEmail(email);
-            session.setAttribute("loginName", dto.getName());
-            session.setAttribute("loginEmail", dto.getEmail());
-            view.setViewName("Home");
+            if (dto != null) {
+                session.setAttribute("loginName", dto.getName());
+                session.setAttribute("loginEmail", dto.getEmail());
+                view.setViewName("ForgotPassword");
+            } else {
+                // fallback if somehow email not found
+                view.addObject("status", "notfound");
+                view.setViewName("OtpLogin");
+            }
         }
         return view;
     }
@@ -227,4 +245,5 @@ public class SignUpController {
         view.setViewName("OtpLogin");
         return view;
     }
+
 }
